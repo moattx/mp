@@ -1,21 +1,19 @@
 use rodio::source::{SineWave, Source};
+use rodio::OutputStreamHandle;
 use rodio::{Decoder, OutputStream, Sink};
 use std::fs::File;
 use std::io::BufReader;
-use std::{collections::HashMap, env, thread, time::Duration};
-//use rodio::OutputStream;
-use rodio::OutputStreamHandle;
 use std::sync::mpsc;
 use std::sync::Mutex;
+use std::{collections::HashMap, env, thread, time::Duration};
 
 static m: Mutex<Duration> = Mutex::new(Duration::ZERO);
-
 
 static location: Mutex<u16> = Mutex::new(0);
 
 pub fn get_location() -> u16 {
     let mut num = location.lock().unwrap();
-    *num 
+    *num
 }
 
 pub fn send_duration(duration: u64) {
@@ -27,10 +25,6 @@ pub fn send_duration(duration: u64) {
 // updates every second in a loop
 
 pub fn audio_play(song: String) {
-    //let sink = Sink::try_new(&stream_handle).unwrap();
-    //
-    //
-
     thread::spawn(move || {
         let (_stream, stream_handle) = OutputStream::try_default().unwrap();
         let sink = Sink::try_new(&stream_handle).unwrap();
@@ -42,14 +36,10 @@ pub fn audio_play(song: String) {
 
         let mut dur: u16 = 1;
 
-        //let mut num = m.lock().unwrap();
-        //num.append(source);
         loop {
-            //check mutex
             dur = (dur + 1) - source_duration as u16;
             {
                 let mut num = location.lock().unwrap();
-                //*num = [dur, source.total_duration];
                 *num = dur;
             }
             {
@@ -62,14 +52,6 @@ pub fn audio_play(song: String) {
             if sink.empty() {
                 return;
             }
-
-
-            //thread::sleep(Duration::from_millis(1000));
-            //sink.sleep_until_end();
-            //sink.sleep_until_end();
-            //self.sink.append(source);
-            //self.sink.sleep_until_end();
         }
-        //break;
     });
 }
